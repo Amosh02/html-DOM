@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script>
+  const car = {
+    brand: "Toyota",
+    model: "Camry",
+    year: 2023,
+    start: function() {
+      return this.brand + " " + this.model + " is starting!";
+    }
+  };
+
+  document.write("Car brand: " + car.brand + "<br>");
+  document.write("Car model: " + car["model"] + "<br>");
+  document.write("Year: " + car.year + "<br>");
+  document.write(car.start()); // method call
+</script>
+
+</body>
+</html>

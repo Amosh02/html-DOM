@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation with JavaScript</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            border-radius: 2px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .error-icon {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            color: #e74c3c;
+            display: none;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #2ecc71;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+        
+        .password-rules {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        
+        .password-rules ul {
+            padding-left: 20px;
+            margin: 10px 0 0;
+        }
+        
+        .password-rules li {
+            margin-bottom: 5px;
+        }
+        
+        .password-rules li.valid {
+            color: #27ae60;
+        }
+        
+        .password-rules li.valid::before {
+            content: '✓ ';
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .form-footer a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .validation-result {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #27ae60;
+            border: 1px solid #2ecc71;
+        }
+        
+        .error {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+        }
+        
+        .show-password {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .show-password input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Account Registration</h1>
+        
+        <form id="registrationForm">
+            <!-- Username Field -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
+                <span class="error-icon">✗</span>
+                <div class="error-message" id="username-error">Username must be 3-20 characters and contain only letters, numbers, and underscores</div>
+                <div class="success-message" id="username-success">Username is valid!</div>
+            </div>
+            
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email">
+                <span class="error-icon">✗</span>
+                <div class="error-message" id="email-error">Please enter a valid email address</div>
+                <div class="success-message" id="email-success">Email is valid!</div>
+            </div>
+            
+            <!-- Phone Field -->
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="Enter your phone number">
+                <span class="error-icon">✗</span>
+                <div class="error-message" id="phone-error">Please enter a valid 10-digit phone number</div>
+                <div class="success-message" id="phone-success">Phone number is valid!</div>
+            </div>
+            
+            <!-- Password Rules -->
+            <div class="password-rules">
+                <strong>Password Requirements:</strong>
+                <ul id="passwordRules">
+                    <li id="lengthRule">At least 8 characters</li>
+                    <li id="uppercaseRule">One uppercase letter</li>
+                    <li id="lowercaseRule">One lowercase letter</li>
+                    <li id="numberRule">One number</li>
+                    <li id="specialRule">One special character (!@#$%^&*)</li>
+                </ul>
+            </div>
+            
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a password">
+                <span class="error-icon">✗</span>
+                <div class="error-message" id="password-error">Password does not meet requirements</div>
+                <div class="success-message" id="password-success">Password is strong!</div>
+            </div>
+            
+            <!-- Confirm Password Field -->
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm your password">
+                <span class="error-icon">✗</span>
+                <div class="error-message" id="confirm-error">Passwords do not match</div>
+                <div class="success-message" id="confirm-success">Passwords match!</div>
+            </div>
+            
+            <!-- Show Password Toggle -->
+            <div class="show-password">
+                <input type="checkbox" id="showPassword">
+                <label for="showPassword">Show Passwords</label>
+            </div>
+            
+            <!-- Validation Result -->
+            <div class="validation-result" id="validationResult"></div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn">Create Account</button>
+        </form>
+        
+        <div class="form-footer">
+            Already have an account? <a href="#">Sign In</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get form elements
+            const form = document.getElementById('registrationForm');
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const showPassword = document.getElementById('showPassword');
+            const validationResult = document.getElementById('validationResult');
+            
+            // Regular expressions for validation
+            const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
+            const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const PHONE_REGEX = /^\d{10}$/;
+            
+            // Password requirements
+            const PASSWORD_REQUIREMENTS = {
+                length: { regex: /.{8,}/, element: document.getElementById('lengthRule') },
+                uppercase: { regex: /[A-Z]/, element: document.getElementById('uppercaseRule') },
+                lowercase: { regex: /[a-z]/, element: document.getElementById('lowercaseRule') },
+                number: { regex: /[0-9]/, element: document.getElementById('numberRule') },
+                special: { regex: /[!@#$%^&*]/, element: document.getElementById('specialRule') }
+            };
+            
+            // Show/hide password toggle
+            showPassword.addEventListener('change', function() {
+                const type = this.checked ? 'text' : 'password';
+                password.type = type;
+                confirmPassword.type = type;
+            });
+            
+            // Real-time validation functions
+            function validateUsername() {
+                const value = username.value.trim();
+                const isValid = USERNAME_REGEX.test(value);
+                
+                updateFieldValidation(username, 'username', isValid, 
+                    'Username must be 3-20 characters and contain only letters, numbers, and underscores');
+                
+                return isValid;
+            }
+            
+            function validateEmail() {
+                const value = email.value.trim();
+                const isValid = EMAIL_REGEX.test(value);
+                
+                updateFieldValidation(email, 'email', isValid, 
+                    'Please enter a valid email address');
+                
+                return isValid;
+            }
+            
+            function validatePhone() {
+                const value = phone.value.trim();
+                // Remove any non-digit characters
+                phone.value = value.replace(/\D/g, '');
+                const isValid = PHONE_REGEX.test(phone.value);
+                
+                updateFieldValidation(phone, 'phone', isValid, 
+                    'Please enter a valid 10-digit phone number');
+                
+                return isValid;
+            }
+            
+            function validatePassword() {
+                const value = password.value;
+                let allValid = true;
+                
+                // Check each requirement
+                for (const [key, requirement] of Object.entries(PASSWORD_REQUIREMENTS)) {
+                    const isValid = requirement.regex.test(value);
+                    
+                    if (isValid) {
+                        requirement.element.classList.add('valid');
+                    } else {
+                        requirement.element.classList.remove('valid');
+                        allValid = false;
+                    }
+                }
+                
+                updateFieldValidation(password, 'password', allValid, 
+                    'Password does not meet requirements');
+                
+                // Also validate confirmation when password changes
+                if (confirmPassword.value) {
+                    validatePasswordConfirmation();
+                }
+                
+                return allValid;
+            }
+            
+            function validatePasswordConfirmation() {
+                const isValid = password.value === confirmPassword.value && password.value !== '';
+                
+                updateFieldValidation(confirmPassword, 'confirm', isValid, 
+                    'Passwords do not match');
+                
+                return isValid;
+            }
+            
+            // Update field validation UI
+            function updateFieldValidation(field, fieldName, isValid, errorMessage) {
+                const errorElement = document.getElementById(`${fieldName}-error`);
+                const successElement = document.getElementById(`${fieldName}-success`);
+                const errorIcon = field.nextElementSibling;
+                
+                if (field.value.trim() === '') {
+                    // Field is empty
+                    errorElement.style.display = 'none';
+                    successElement.style.display = 'none';
+                    errorIcon.style.display = 'none';
+                    field.style.borderColor = '#e0e0e0';
+                } else if (isValid) {
+                    // Field is valid
+                    errorElement.style.display = 'none';
+                    successElement.style.display = 'block';
+                    errorIcon.style.display = 'none';
+                    field.style.borderColor = '#2ecc71';
+                } else {
+                    // Field is invalid
+                    errorElement.style.display = 'block';
+                    successElement.style.display = 'none';
+                    errorIcon.style.display = 'block';
+                    field.style.borderColor = '#e74c3c';
+                    errorElement.textContent = errorMessage;
+                }
+            }
+            
+            // Event listeners for real-time validation
+            username.addEventListener('input', validateUsername);
+            email.addEventListener('input', validateEmail);
+            phone.addEventListener('input', validatePhone);
+            password.addEventListener('input', validatePassword);
+            confirmPassword.addEventListener('input', validatePasswordConfirmation);
+            
+            // Form submission handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all fields
+                const isUsernameValid = validateUsername();
+                const isEmailValid = validateEmail();
+                const isPhoneValid = validatePhone();
+                const isPasswordValid = validatePassword();
+                const isConfirmValid = validatePasswordConfirmation();
+                
+                const allValid = isUsernameValid && isEmailValid && isPhoneValid && 
+                                isPasswordValid && isConfirmValid;
+                
+                // Display result
+                if (allValid) {
+                    validationResult.textContent = '✅ Form submitted successfully! All fields are valid.';
+                    validationResult.className = 'validation-result success';
+                    validationResult.style.display = 'block';
+                    
+                    // In a real app, you would submit the form to a server here
+                    setTimeout(() => {
+                        validationResult.textContent = 'Account created successfully! Redirecting...';
+                        // form.reset();
+                    }, 1500);
+                } else {
+                    validationResult.textContent = '❌ Please fix the errors in the form before submitting.';
+                    validationResult.className = 'validation-result error';
+                    validationResult.style.display = 'block';
+                }
+                
+                // Scroll to result
+                validationResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            
+            // Initialize password validation on page load
+            validatePassword();
+        });
+    </script>
+</body>
+</html>
