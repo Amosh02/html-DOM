@@ -1,0 +1,19 @@
+<html>
+<head>
+  <title>Counter</title>
+</head>
+<body>
+
+<p id="count">0</p>
+<button onclick="increase()">+1</button>
+
+<script>
+  let num = 0;
+  function increase() {
+    num++;
+    document.getElementById("count").innerText = num;
+  }
+</script>
+
+</body>
+</html>
